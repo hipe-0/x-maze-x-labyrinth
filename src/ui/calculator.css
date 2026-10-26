@@ -132,6 +132,8 @@
 
 .lcd-window {
   position: relative;
+  display: grid;
+  place-items: center;
   aspect-ratio: 3 / 2;
   overflow: hidden;
   border-radius: 0.55cqw;
@@ -170,7 +172,7 @@
   background: repeating-linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.08) 0 1px,
-    transparent 1px 3px
+    transparent 1px var(--lcd-cell, 3px)
   );
   mix-blend-mode: multiply;
 }
@@ -393,15 +395,6 @@
 .key--cap .key__legend {
   font-size: 2.1cqw;
   font-weight: 600;
-}
-
-.key--hub {
-  background: linear-gradient(180deg, #2b3b42 0%, #1b292f 55%, #121c20 100%);
-}
-
-.key--hub .key__legend {
-  font-size: 3.2cqw;
-  font-weight: 700;
 }
 
 /* Active white dotted keys */
