@@ -64,18 +64,22 @@ function rotateClockwise(pattern: readonly string[]): string[] {
   )
 }
 
+/** How many clockwise turns each heading is from the upright arrow. */
+const TURNS_FROM_UP: Array<[Angle, number]> = [
+  [90, 0],
+  [0, 1],
+  [270, 2],
+  [180, 3],
+]
+
 function buildArrows(): Record<Angle, readonly string[]> {
   const arrows = {} as Record<Angle, readonly string[]>
-  let pattern: readonly string[] = ARROW_UP
-  const steps: Array<[Angle, number]> = [
-    [90, 0],
-    [0, 1],
-    [270, 2],
-    [180, 3],
-  ]
 
-  for (const [angle, turns] of steps) {
-    for (let i = 0; i < turns; i += 1) {
+  for (const [angle, turns] of TURNS_FROM_UP) {
+    // Every heading starts from the upright arrow. Rotating the previously
+    // built arrow instead would compound the turns and skew the compass.
+    let pattern: readonly string[] = ARROW_UP
+    for (let turn = 0; turn < turns; turn += 1) {
       pattern = rotateClockwise(pattern)
     }
     arrows[angle] = pattern
