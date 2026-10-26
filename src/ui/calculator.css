@@ -376,6 +376,8 @@
     0 0.52cqw 0 #090c0d,
     0 0.8cqw 1.2cqw rgba(0, 0, 0, 0.35),
     inset 0 0.15cqw 0 rgba(255, 255, 255, 0.07);
+  opacity: 0.46;
+  filter: saturate(0.45);
 }
 
 .key--num .key__legend {
