@@ -186,9 +186,9 @@ describe('draw3D side faces', () => {
     expect(interiorInk(fb, endWall)).toEqual([])
   })
 
-  it('stops at the end of the opening that reveals the wall', () => {
+  it('clips a face at the far edge of its opening', () => {
     // The opening only spans the player's own cell, so the face two cells on
-    // is behind the side wall at the next cell and must not be drawn over it.
+    // is cut off at the side wall that ends the opening instead of crossing it.
     const walls = carve([
       ...corridor(5, 5, 6),
       [5, 4, 5, 5],
@@ -197,12 +197,15 @@ describe('draw3D side faces', () => {
     ])
 
     const fb = renderFrame(walls, 5, 5)
-    const sideBand = frame(1)[0]
+    const face = frame(3)
+    const cutoff = frame(1)[0]
 
-    for (let y = 0; y < fb.height; y += 1) {
-      for (let x = 0; x < sideBand; x += 1) {
-        expect(inkAt(fb, x, y)).toBe(false)
-      }
+    expect(inkAt(fb, 0, face[1])).toBe(true)
+    expect(inkAt(fb, 0, face[3])).toBe(true)
+    // Nothing is drawn past the opening's far edge.
+    for (let x = cutoff + 1; x < frame(2)[0]; x += 1) {
+      expect(inkAt(fb, x, face[1])).toBe(false)
+      expect(inkAt(fb, x, face[3])).toBe(false)
     }
   })
 

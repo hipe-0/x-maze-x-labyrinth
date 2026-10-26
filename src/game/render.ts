@@ -226,8 +226,12 @@ function drawSideFace(
   const lastOpen = openRunEnd(walls, cw, cz, side, forward, from)
   const sw = cw + side[0]
   const sz = cz + side[1]
+  // The far edge of the opening. Anything past it is behind the side wall that
+  // ends the opening, so a deeper face is cut off at this line.
+  const cutoff = rects[lastOpen + 1]
+  const cutoffX = onLeft ? cutoff[0] : cutoff[2]
 
-  for (let ahead = 0; from + ahead <= lastOpen; ahead += 1) {
+  for (let ahead = 0; from + ahead < MAXD; ahead += 1) {
     const wj = sw + forward[0] * ahead
     const zj = sz + forward[1] * ahead
     if (wj < 0 || wj >= TW || zj < 0 || zj >= TH) return
@@ -237,7 +241,10 @@ function drawSideFace(
     if (faceDepth > corridorEnd) return
 
     const face = rects[faceDepth]
-    const edge = onLeft ? face[0] : face[2]
+    const corner = onLeft ? face[0] : face[2]
+    const edge = onLeft
+      ? Math.min(corner, cutoffX)
+      : Math.max(corner, cutoffX)
     const start =
       from === 0
         ? onLeft
@@ -249,7 +256,9 @@ function drawSideFace(
 
     fb.line(start, face[1], edge, face[1])
     fb.line(start, face[3], edge, face[3])
-    fb.line(edge, face[1], edge, face[3])
+    // Only a face that ends inside the opening shows its own vertical corner;
+    // a cut-off one is closed by the side wall at the opening's far edge.
+    if (edge === corner) fb.line(corner, face[1], corner, face[3])
     return
   }
 }
