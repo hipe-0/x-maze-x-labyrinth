@@ -1,25 +1,32 @@
-import { useCallback, useState, type PointerEvent, type ReactNode } from 'react'
+import {
+  useCallback,
+  useState,
+  type PointerEvent,
+  type ReactNode,
+} from 'react'
 import type { Action } from '../game/game'
 
 interface KeyProps {
   action: Action
   label?: string
-  sublabel?: string
   ariaLabel: string
   onAction: (action: Action) => void
   onRelease: (action: Action) => void
   className?: string
+  band?: ReactNode
+  foot?: string
   children?: ReactNode
 }
 
 export function Key({
   action,
   label,
-  sublabel,
   ariaLabel,
   onAction,
   onRelease,
   className = '',
+  band,
+  foot,
   children,
 }: KeyProps) {
   const [pressed, setPressed] = useState(false)
@@ -60,9 +67,12 @@ export function Key({
       }}
       onContextMenu={(event) => event.preventDefault()}
     >
-      {children}
-      {label ? <span className="key__legend">{label}</span> : null}
-      {sublabel ? <span className="key__sub">{sublabel}</span> : null}
+      {band ? <span className="key__band">{band}</span> : null}
+      <span className="key__main">
+        {children}
+        {label ? <span className="key__legend">{label}</span> : null}
+      </span>
+      {foot ? <span className="key__foot">{foot}</span> : null}
     </button>
   )
 }

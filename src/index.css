@@ -18,13 +18,6 @@
   --lcd-ink: #181e18;
   --body-dark: #1b1d1b;
   --body-mid: #2a2d29;
-  --cream: #d9d6c6;
-  --cream-dark: #c2bfae;
-  --key-dark: #242622;
-  --key-faded: #2a2d28;
-  --key-faded-text: #5c6258;
-  --blue-gray: #4e5c60;
-  --blue-gray-light: #667579;
   --orange: #c77645;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -108,6 +101,7 @@ button {
 .app {
   display: flex;
   flex-direction: column;
+  height: 100dvh;
   min-height: 100dvh;
   padding: calc(16px + var(--safe-top)) clamp(14px, 4vw, 40px)
     calc(12px + var(--safe-bottom));
@@ -224,6 +218,7 @@ button {
   min-height: 0;
   width: 100%;
   padding: clamp(8px, 2vh, 22px) 0;
+  container-type: size;
 }
 
 .site-footer {

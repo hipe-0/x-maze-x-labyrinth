@@ -41,6 +41,15 @@ export function SoundOffIcon(props: IconProps) {
   )
 }
 
+export function ReturnIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M20 5.5v6.4a3.6 3.6 0 0 1-3.6 3.6H5" />
+      <path d="M8.6 11.6 4.6 15.5l4 3.9" />
+    </IconBase>
+  )
+}
+
 export function ShareIcon(props: IconProps) {
   return (
     <IconBase {...props}>

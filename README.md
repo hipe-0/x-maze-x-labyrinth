@@ -36,8 +36,9 @@ network, so you can open it on a phone during development.
 | `Enter` / `Space` / `J` | Select in menus · pause during play |
 | `Esc` | Back · pause / resume |
 
-On touch devices, the cross D-pad and the large **EXE** key are the only active
-calculator keys. The rest of the keypad is drawn but disabled for now.
+On touch devices, the white dotted arrow keys and the black **EXE** key are the
+only active calculator keys. The rest of the keypad is drawn but disabled for
+now.
 
 ## Screens
 

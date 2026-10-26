@@ -88,7 +88,7 @@ export function AboutModal({ onClose }: { onClose: () => void }) {
         </ul>
 
         <p className="modal__hint">
-          Only the cream D-pad and EXE keys are active. The rest of the
+          Only the white dotted arrow keys and EXE are active. The rest of the
           scientific keypad is a visual tribute for now.
         </p>
 
