@@ -156,6 +156,25 @@ describe('draw3D side alcoves', () => {
     expect(inkAt(fb, 0, endWall[3])).toBe(true)
   })
 
+  it('carries a close wide wall out to both screen edges', () => {
+    // A wall one cell ahead running past the player on both sides: the two
+    // side faces are coplanar with it and continue it to the screen edges.
+    const walls = carve([
+      [4, 5, 5, 5],
+      [5, 4, 5, 5],
+      [5, 5, 5, 6],
+    ])
+
+    const fb = renderFrame(walls, 5, 5)
+    const endWall = frame(1)
+
+    for (const y of [endWall[1], endWall[3]]) {
+      expect(inkAt(fb, 0, y)).toBe(true)
+      expect(inkAt(fb, FB_W - 1, y)).toBe(true)
+    }
+    expect(interiorInk(fb, endWall)).toEqual([])
+  })
+
   it.each(SEEDS)('never nests a front face inside another for seed %i', (seed) => {
     const maze = new Maze(seed)
 

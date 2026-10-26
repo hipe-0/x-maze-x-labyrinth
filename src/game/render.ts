@@ -34,13 +34,19 @@ const MENU_BAR_H = 10
 
 /**
  * Whether the front-facing wall of a side alcove is actually in view.
- * `forwardIndex` counts cells ahead of the player: a wall in the first one sits
- * level with the player, outside the projection, and a wall past the corridor's
- * own front wall can only be drawn inside that front face. The 1991 renderer
- * drew both, which smeared stray wireframe across the walls in front.
+ * `forwardIndex` counts cells ahead of the player and `corridorEnd` is the
+ * depth index of the corridor's own front wall.
+ *
+ * A face at exactly the front wall's depth is coplanar with it: the two join
+ * into one wall, which is how a wide wall facing the player stays continuous
+ * out to the screen edges. Any other face must sit ahead of the player and
+ * before that front wall, or it is either outside the projection or would be
+ * drawn inside a nearer wall face.
  */
 function alcoveInView(forwardIndex: number, corridorEnd: number): boolean {
-  return forwardIndex > 0 && forwardIndex < corridorEnd
+  const faceDepth = forwardIndex + 1
+  if (faceDepth === corridorEnd) return true
+  return faceDepth > 1 && faceDepth < corridorEnd
 }
 
 function drawMenu(
