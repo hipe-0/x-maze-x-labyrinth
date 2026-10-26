@@ -125,6 +125,57 @@ describe('draw3D side faces', () => {
     }
   })
 
+  it('draws a face from every cell of the opening, on both sides', () => {
+    // Opening spans the player's cell and the one ahead on both sides. Each of
+    // those cells closes off at its own depth, so the wall steps outward:
+    // screen edge -> frame 1 -> frame 2, matching the corridor's front wall.
+    const walls = carve([
+      [4, 5, 5, 5],
+      [5, 5, 6, 5],
+      [5, 5, 5, 6],
+      [6, 5, 6, 6],
+      [5, 4, 5, 5],
+      [6, 4, 6, 5],
+    ])
+
+    const fb = renderFrame(walls, 5, 5)
+    const near = frame(1)
+    const far = frame(2)
+
+    for (const y of [near[1], near[3]]) {
+      expect(inkAt(fb, 0, y)).toBe(true)
+      expect(inkAt(fb, FB_W - 1, y)).toBe(true)
+    }
+    for (const y of [far[1], far[3]]) {
+      expect(inkAt(fb, near[0] + 2, y)).toBe(true)
+      expect(inkAt(fb, near[2] - 2, y)).toBe(true)
+    }
+    expect(interiorInk(fb, far)).toEqual([])
+  })
+
+  it('draws both far side faces when the opening starts at the player', () => {
+    // The irregular case: the opening begins at the player's cell, so a scan
+    // driven by the opening's first cell would stop at the near face and never
+    // reach the one beside the next cell.
+    const walls = carve([
+      [4, 5, 5, 5],
+      [5, 5, 6, 5],
+      [5, 4, 5, 5],
+      [6, 4, 6, 5],
+      [5, 5, 5, 6],
+      [6, 5, 6, 6],
+    ])
+
+    const fb = renderFrame(walls, 5, 5)
+    const far = frame(2)
+
+    expect(inkAt(fb, frame(1)[0] + 2, far[1])).toBe(true)
+    expect(inkAt(fb, frame(1)[2] - 2, far[1])).toBe(true)
+    expect(inkAt(fb, frame(1)[0] + 2, far[3])).toBe(true)
+    expect(inkAt(fb, frame(1)[2] - 2, far[3])).toBe(true)
+  })
+
+
   it('leaves out a front-facing wall past the corridor end', () => {
     // Corridor ends three cells ahead. The left alcove's far wall sits one
     // cell deeper, hidden behind the corridor's own front face.

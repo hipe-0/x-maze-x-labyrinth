@@ -288,8 +288,6 @@ export function draw3D(
 
   let cw = playerW
   let cz = playerZ
-  let leftOpenFrom: number | null = null
-  let rightOpenFrom: number | null = null
 
   for (let depth = 0; depth < MAXD; depth += 1) {
     if (cw < 0 || cw >= TW || cz < 0 || cz >= TH) return
@@ -301,51 +299,43 @@ export function draw3D(
     const [left1, top1, right1, bottom1] = next
 
     if ((currentWalls & wallOf(left)) !== 0) {
-      leftOpenFrom = null
       fb.line(left0, top0, left1, top1)
       fb.line(left0, bottom0, left1, bottom1)
       fb.line(left0, top0, left0, bottom0)
       fb.line(left1, top1, left1, bottom1)
     } else {
-      if (leftOpenFrom === null) leftOpenFrom = depth
-      if (leftOpenFrom === depth) {
-        drawSideFace(
-          fb,
-          rects,
-          maze.walls,
-          cw,
-          cz,
-          left,
-          forward,
-          depth,
-          corridorEnd,
-          true,
-        )
-      }
+      drawSideFace(
+        fb,
+        rects,
+        maze.walls,
+        cw,
+        cz,
+        left,
+        forward,
+        depth,
+        corridorEnd,
+        true,
+      )
     }
 
     if ((currentWalls & wallOf(right)) !== 0) {
-      rightOpenFrom = null
       fb.line(right0, top0, right1, top1)
       fb.line(right0, bottom0, right1, bottom1)
       fb.line(right0, top0, right0, bottom0)
       fb.line(right1, top1, right1, bottom1)
     } else {
-      if (rightOpenFrom === null) rightOpenFrom = depth
-      if (rightOpenFrom === depth) {
-        drawSideFace(
-          fb,
-          rects,
-          maze.walls,
-          cw,
-          cz,
-          right,
-          forward,
-          depth,
-          corridorEnd,
-          false,
-        )
-      }
+      drawSideFace(
+        fb,
+        rects,
+        maze.walls,
+        cw,
+        cz,
+        right,
+        forward,
+        depth,
+        corridorEnd,
+        false,
+      )
     }
 
     if ((currentWalls & wallOf(forward)) !== 0) {
