@@ -28,7 +28,11 @@ export function Key({
     (event: PointerEvent<HTMLButtonElement>) => {
       if (event.pointerType === 'mouse' && event.button !== 0) return
       event.preventDefault()
-      event.currentTarget.setPointerCapture(event.pointerId)
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId)
+      } catch {
+        // Pointer capture is an enhancement; the button still works without it.
+      }
       setPressed(true)
       onAction(action)
     },
