@@ -74,9 +74,6 @@ export function Calculator({ game, onAction, onRelease }: CalculatorProps) {
 
           <div className="keypad-grid">
             <IdleKey band="A-LOCK" label="SHIFT" />
-            <IdleKey band="A" label="ALPHA" />
-            <IdleKey band="RUN" label="MODE" />
-            <IdleKey band="A" label="7" foot="M" className="key--num" />
             <Key
               action="up"
               ariaLabel="Up / move forward"
@@ -85,13 +82,13 @@ export function Calculator({ game, onAction, onRelease }: CalculatorProps) {
               className="key--arrow"
               band={<ArrowGlyph direction="up" />}
             />
+            <IdleKey band="RUN" label="MODE" />
+            <IdleKey band="A" label="7" foot="M" className="key--num" />
+            <IdleKey band="B" label="8" foot="N" className="key--num" />
             <IdleKey band="C" label="9" foot="O" className="key--num" />
             <IdleKey band="Mol" label="DEL" foot="ON" className="key--cap" />
             <IdleKey band="Scl" label="AC" className="key--cap" />
 
-            <IdleKey band="X-Y" label="Cls" />
-            <IdleKey band="≡" label="ENG" />
-            <IdleKey band="Goto" label="Prog" />
             <Key
               action="left"
               ariaLabel="Left / turn left"
@@ -100,7 +97,7 @@ export function Calculator({ game, onAction, onRelease }: CalculatorProps) {
               className="key--arrow"
               band={<ArrowGlyph direction="left" />}
             />
-            <IdleKey band="MAZE" label="5" foot="X" className="key--hub" />
+            <IdleKey band="≡" label="ENG" />
             <Key
               action="right"
               ariaLabel="Right / turn right"
@@ -109,13 +106,13 @@ export function Calculator({ game, onAction, onRelease }: CalculatorProps) {
               className="key--arrow"
               band={<ArrowGlyph direction="right" />}
             />
+            <IdleKey band="D" label="4" foot="P" className="key--num" />
+            <IdleKey band="E" label="5" foot="Q" className="key--num" />
+            <IdleKey band="F" label="6" foot="R" className="key--num" />
             <IdleKey band="Or" label="×" className="key--op" />
             <IdleKey band="Rec" label="÷" className="key--op" />
 
             <IdleKey band="Y" label="Graph" />
-            <IdleKey band="S" label="Range" />
-            <IdleKey band="Lbl" label="Plot" />
-            <IdleKey band="Dez" label="1" foot="U" className="key--num" />
             <Key
               action="down"
               ariaLabel="Down / move back"
@@ -124,6 +121,9 @@ export function Calculator({ game, onAction, onRelease }: CalculatorProps) {
               className="key--arrow"
               band={<ArrowGlyph direction="down" />}
             />
+            <IdleKey band="Lbl" label="Plot" />
+            <IdleKey band="Dez" label="1" foot="U" className="key--num" />
+            <IdleKey band="X" label="2" foot="V" className="key--num" />
             <IdleKey band="Xn-1" label="3" foot="W" className="key--num" />
             <IdleKey band="Pol" label="+" className="key--op" />
             <IdleKey band="Rec" label="−" className="key--op" />
