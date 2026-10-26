@@ -32,6 +32,17 @@ const MENU_BAR_X = 18
 const MENU_BAR_W = 65
 const MENU_BAR_H = 10
 
+/**
+ * Whether the front-facing wall of a side alcove is actually in view.
+ * `forwardIndex` counts cells ahead of the player: a wall in the first one sits
+ * level with the player, outside the projection, and a wall past the corridor's
+ * own front wall can only be drawn inside that front face. The 1991 renderer
+ * drew both, which smeared stray wireframe across the walls in front.
+ */
+function alcoveInView(forwardIndex: number, corridorEnd: number): boolean {
+  return forwardIndex > 0 && forwardIndex < corridorEnd
+}
+
 function drawMenu(
   fb: Framebuffer,
   items: readonly string[],
@@ -185,6 +196,20 @@ export function draw3D(
   const left = LEFT_OF[angle]
   const right = RIGHT_OF[angle]
 
+  // Depth index of the corridor's own front wall, or MAXD when the corridor
+  // runs past the farthest frame. A side alcove deeper than this is hidden
+  // behind that wall, so drawing it would put wireframe inside the wall face.
+  let corridorEnd = MAXD
+  for (let step = 0; step < MAXD; step += 1) {
+    const w = playerW + forward[0] * step
+    const z = playerZ + forward[1] * step
+    if (w < 0 || w >= TW || z < 0 || z >= TH) break
+    if ((maze.walls[w][z] & wallOf(forward)) !== 0) {
+      corridorEnd = step + 1
+      break
+    }
+  }
+
   let cw = playerW
   let cz = playerZ
   let leftBlocked = false
@@ -213,6 +238,7 @@ export function draw3D(
         const zj = nz + forward[1] * ahead
         if (wj < 0 || wj >= TW || zj < 0 || zj >= TH) break
         if ((maze.walls[wj][zj] & wallOf(forward)) !== 0) {
+          if (!alcoveInView(depth + ahead, corridorEnd)) break
           const frame = rects[depth + 1 + ahead]
           fb.line(0, frame[1], frame[0], frame[1])
           fb.line(0, frame[3], frame[0], frame[3])
@@ -236,6 +262,7 @@ export function draw3D(
         const zj = nz + forward[1] * ahead
         if (wj < 0 || wj >= TW || zj < 0 || zj >= TH) break
         if ((maze.walls[wj][zj] & wallOf(forward)) !== 0) {
+          if (!alcoveInView(depth + ahead, corridorEnd)) break
           const frame = rects[depth + 1 + ahead]
           fb.line(frame[2], frame[1], FB_W - 1, frame[1])
           fb.line(frame[2], frame[3], FB_W - 1, frame[3])
