@@ -80,6 +80,18 @@ npm run build     # production build in dist/
 npm run preview   # preview the production build
 ```
 
+### VS Code
+
+Open this folder in VS Code and press **Ctrl+Shift+B** to run the default build
+task, **Dev: start server**. The integrated terminal prints the local URL; the
+task keeps running so the dev server stays up. Stop it with `Ctrl+C` or the
+terminal trash icon.
+
+`Terminal → Run Task…` also lists **Dev: open app in browser**, which opens
+`http://localhost:5173/` in your default browser.
+
+The task is defined in `.vscode/tasks.json`.
+
 ## Deploy to GitHub Pages
 
 The repository includes `.github/workflows/deploy.yml`.

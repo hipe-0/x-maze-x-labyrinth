@@ -1,0 +1,58 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dev: start server",
+      "detail": "Start the Vite dev server on http://localhost:5173",
+      "type": "npm",
+      "script": "dev",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": {
+          "regexp": "^(.*):(\\d+):(\\d+):\\s+(error|warning):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "severity": 4,
+          "message": 5
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "VITE",
+          "endsPattern": "http://localhost"
+        }
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Dev: open app in browser",
+      "detail": "Open http://localhost:5173 in the default browser",
+      "type": "shell",
+      "command": "cmd",
+      "args": ["/c", "start", "", "http://localhost:5173/"],
+      "windows": {
+        "command": "cmd",
+        "args": ["/c", "start", "", "http://localhost:5173/"]
+      },
+      "linux": {
+        "command": "xdg-open",
+        "args": ["http://localhost:5173/"]
+      },
+      "osx": {
+        "command": "open",
+        "args": ["http://localhost:5173/"]
+      },
+      "problemMatcher": []
+    }
+  ]
+}
