@@ -98,22 +98,31 @@ function corridorEnd(
   return MAXD
 }
 
-describe('draw3D side alcoves', () => {
-  it('leaves out a front-facing wall level with the player', () => {
-    // A niche beside the player: its far wall is level with the far side of
-    // the player's own cell, so it falls outside the view.
+describe('draw3D side faces', () => {
+  it('draws a wall at distance 0.5 beside an open corridor side', () => {
+    // A niche beside the player: its far wall is level with the far side of the
+    // player's own cell, so it continues the wall face out to the screen edge.
     const walls = carve([...corridor(5, 5, 6), [5, 4, 5, 5]])
     const fb = renderFrame(walls, 5, 5)
-    const sideBand = frame(1)[0]
+    const face = frame(1)
 
-    const found: Array<[number, number]> = []
-    for (let y = 0; y < fb.height; y += 1) {
-      for (let x = 0; x < sideBand; x += 1) {
-        if (inkAt(fb, x, y)) found.push([x, y])
-      }
+    expect(inkAt(fb, 0, face[1])).toBe(true)
+    expect(inkAt(fb, 0, face[3])).toBe(true)
+    expect(inkAt(fb, face[0], face[1])).toBe(true)
+  })
+
+  it('still draws that wall from one cell back', () => {
+    // Same wall seen from the cell before, so it must not pop in on arrival.
+    // The opening now starts ahead of the player, so the strip is narrower.
+    const walls = carve([...corridor(3, 5, 8), [5, 4, 5, 5]])
+    const fb = renderFrame(walls, 4, 5)
+    const face = frame(2)
+
+    // The strip spans the opening's near edge to the face, one frame band.
+    for (let x = frame(1)[0] + 1; x < face[0]; x += 1) {
+      expect(inkAt(fb, x, face[1])).toBe(true)
+      expect(inkAt(fb, x, face[3])).toBe(true)
     }
-
-    expect(found).toEqual([])
   })
 
   it('leaves out a front-facing wall past the corridor end', () => {
@@ -142,6 +151,8 @@ describe('draw3D side alcoves', () => {
       ...corridor(5, 5, 3),
       [5, 4, 5, 5],
       [6, 4, 6, 5],
+      [7, 4, 7, 5],
+      [8, 4, 8, 5],
       [5, 4, 6, 4],
       [6, 4, 7, 4],
       [7, 4, 8, 4],
@@ -173,6 +184,26 @@ describe('draw3D side alcoves', () => {
       expect(inkAt(fb, FB_W - 1, y)).toBe(true)
     }
     expect(interiorInk(fb, endWall)).toEqual([])
+  })
+
+  it('stops at the end of the opening that reveals the wall', () => {
+    // The opening only spans the player's own cell, so the face two cells on
+    // is behind the side wall at the next cell and must not be drawn over it.
+    const walls = carve([
+      ...corridor(5, 5, 6),
+      [5, 4, 5, 5],
+      [5, 4, 6, 4],
+      [6, 4, 7, 4],
+    ])
+
+    const fb = renderFrame(walls, 5, 5)
+    const sideBand = frame(1)[0]
+
+    for (let y = 0; y < fb.height; y += 1) {
+      for (let x = 0; x < sideBand; x += 1) {
+        expect(inkAt(fb, x, y)).toBe(false)
+      }
+    }
   })
 
   it.each(SEEDS)('never nests a front face inside another for seed %i', (seed) => {

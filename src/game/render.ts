@@ -19,6 +19,7 @@ import {
   WALL_W,
   wallOf,
   type Angle,
+  type Vec,
 } from './constants'
 import { ARROWS } from './font'
 import type { Framebuffer } from './framebuffer'
@@ -31,23 +32,6 @@ const MENU_TEXT_X = 24
 const MENU_BAR_X = 18
 const MENU_BAR_W = 65
 const MENU_BAR_H = 10
-
-/**
- * Whether the front-facing wall of a side alcove is actually in view.
- * `forwardIndex` counts cells ahead of the player and `corridorEnd` is the
- * depth index of the corridor's own front wall.
- *
- * A face at exactly the front wall's depth is coplanar with it: the two join
- * into one wall, which is how a wide wall facing the player stays continuous
- * out to the screen edges. Any other face must sit ahead of the player and
- * before that front wall, or it is either outside the projection or would be
- * drawn inside a nearer wall face.
- */
-function alcoveInView(forwardIndex: number, corridorEnd: number): boolean {
-  const faceDepth = forwardIndex + 1
-  if (faceDepth === corridorEnd) return true
-  return faceDepth > 1 && faceDepth < corridorEnd
-}
 
 function drawMenu(
   fb: Framebuffer,
@@ -180,6 +164,96 @@ export function drawArrow(fb: Framebuffer, angle: Angle): void {
   }
 }
 
+/**
+ * Depth index of the corridor's own front wall, or MAXD when the corridor runs
+ * past the farthest frame.
+ */
+function corridorReach(
+  walls: number[][],
+  playerW: number,
+  playerZ: number,
+  forward: Vec,
+): number {
+  for (let step = 0; step < MAXD; step += 1) {
+    const w = playerW + forward[0] * step
+    const z = playerZ + forward[1] * step
+    if (w < 0 || w >= TW || z < 0 || z >= TH) break
+    if ((walls[w][z] & wallOf(forward)) !== 0) return step + 1
+  }
+  return MAXD
+}
+
+/** Forward index of the last cell of the opening that starts at `from`. */
+function openRunEnd(
+  walls: number[][],
+  cw: number,
+  cz: number,
+  side: Vec,
+  forward: Vec,
+  from: number,
+): number {
+  let last = from
+  for (let index = from + 1; index < MAXD; index += 1) {
+    const w = cw + forward[0] * (index - from)
+    const z = cz + forward[1] * (index - from)
+    if (w < 0 || w >= TW || z < 0 || z >= TH) break
+    if ((walls[w][z] & wallOf(side)) !== 0) break
+    last = index
+  }
+  return last
+}
+
+/**
+ * Draw the front-facing wall at the back of a side opening, if one is in view.
+ *
+ * Faces follow one rule: a face is drawn unless it sits past the corridor's own
+ * front wall, where it would be painted inside that wall. Side faces are found
+ * by walking the column beside the opening, and the strip is drawn from the
+ * near edge of the opening, so it never crosses the side walls in front of it.
+ */
+function drawSideFace(
+  fb: Framebuffer,
+  rects: ReadonlyArray<readonly [number, number, number, number]>,
+  walls: number[][],
+  cw: number,
+  cz: number,
+  side: Vec,
+  forward: Vec,
+  from: number,
+  corridorEnd: number,
+  onLeft: boolean,
+): void {
+  const lastOpen = openRunEnd(walls, cw, cz, side, forward, from)
+  const sw = cw + side[0]
+  const sz = cz + side[1]
+
+  for (let ahead = 0; from + ahead <= lastOpen; ahead += 1) {
+    const wj = sw + forward[0] * ahead
+    const zj = sz + forward[1] * ahead
+    if (wj < 0 || wj >= TW || zj < 0 || zj >= TH) return
+    if ((walls[wj][zj] & wallOf(forward)) === 0) continue
+
+    const faceDepth = from + ahead + 1
+    if (faceDepth > corridorEnd) return
+
+    const face = rects[faceDepth]
+    const edge = onLeft ? face[0] : face[2]
+    const start =
+      from === 0
+        ? onLeft
+          ? 0
+          : FB_W - 1
+        : onLeft
+          ? rects[from][0]
+          : rects[from][2]
+
+    fb.line(start, face[1], edge, face[1])
+    fb.line(start, face[3], edge, face[3])
+    fb.line(edge, face[1], edge, face[3])
+    return
+  }
+}
+
 export function draw3D(
   fb: Framebuffer,
   maze: Maze,
@@ -201,25 +275,12 @@ export function draw3D(
   const forward = DIRS[angle]
   const left = LEFT_OF[angle]
   const right = RIGHT_OF[angle]
-
-  // Depth index of the corridor's own front wall, or MAXD when the corridor
-  // runs past the farthest frame. A side alcove deeper than this is hidden
-  // behind that wall, so drawing it would put wireframe inside the wall face.
-  let corridorEnd = MAXD
-  for (let step = 0; step < MAXD; step += 1) {
-    const w = playerW + forward[0] * step
-    const z = playerZ + forward[1] * step
-    if (w < 0 || w >= TW || z < 0 || z >= TH) break
-    if ((maze.walls[w][z] & wallOf(forward)) !== 0) {
-      corridorEnd = step + 1
-      break
-    }
-  }
+  const corridorEnd = corridorReach(maze.walls, playerW, playerZ, forward)
 
   let cw = playerW
   let cz = playerZ
-  let leftBlocked = false
-  let rightBlocked = false
+  let leftOpenFrom: number | null = null
+  let rightOpenFrom: number | null = null
 
   for (let depth = 0; depth < MAXD; depth += 1) {
     if (cw < 0 || cw >= TW || cz < 0 || cz >= TH) return
@@ -231,50 +292,50 @@ export function draw3D(
     const [left1, top1, right1, bottom1] = next
 
     if ((currentWalls & wallOf(left)) !== 0) {
-      leftBlocked = true
+      leftOpenFrom = null
       fb.line(left0, top0, left1, top1)
       fb.line(left0, bottom0, left1, bottom1)
       fb.line(left0, top0, left0, bottom0)
       fb.line(left1, top1, left1, bottom1)
-    } else if (!leftBlocked) {
-      const nw = cw + left[0]
-      const nz = cz + left[1]
-      for (let ahead = 0; ahead < MAXD - depth; ahead += 1) {
-        const wj = nw + forward[0] * ahead
-        const zj = nz + forward[1] * ahead
-        if (wj < 0 || wj >= TW || zj < 0 || zj >= TH) break
-        if ((maze.walls[wj][zj] & wallOf(forward)) !== 0) {
-          if (!alcoveInView(depth + ahead, corridorEnd)) break
-          const frame = rects[depth + 1 + ahead]
-          fb.line(0, frame[1], frame[0], frame[1])
-          fb.line(0, frame[3], frame[0], frame[3])
-          fb.line(frame[0], frame[1], frame[0], frame[3])
-          break
-        }
+    } else {
+      if (leftOpenFrom === null) leftOpenFrom = depth
+      if (leftOpenFrom === depth) {
+        drawSideFace(
+          fb,
+          rects,
+          maze.walls,
+          cw,
+          cz,
+          left,
+          forward,
+          depth,
+          corridorEnd,
+          true,
+        )
       }
     }
 
     if ((currentWalls & wallOf(right)) !== 0) {
-      rightBlocked = true
+      rightOpenFrom = null
       fb.line(right0, top0, right1, top1)
       fb.line(right0, bottom0, right1, bottom1)
       fb.line(right0, top0, right0, bottom0)
       fb.line(right1, top1, right1, bottom1)
-    } else if (!rightBlocked) {
-      const nw = cw + right[0]
-      const nz = cz + right[1]
-      for (let ahead = 0; ahead < MAXD - depth; ahead += 1) {
-        const wj = nw + forward[0] * ahead
-        const zj = nz + forward[1] * ahead
-        if (wj < 0 || wj >= TW || zj < 0 || zj >= TH) break
-        if ((maze.walls[wj][zj] & wallOf(forward)) !== 0) {
-          if (!alcoveInView(depth + ahead, corridorEnd)) break
-          const frame = rects[depth + 1 + ahead]
-          fb.line(frame[2], frame[1], FB_W - 1, frame[1])
-          fb.line(frame[2], frame[3], FB_W - 1, frame[3])
-          fb.line(frame[2], frame[1], frame[2], frame[3])
-          break
-        }
+    } else {
+      if (rightOpenFrom === null) rightOpenFrom = depth
+      if (rightOpenFrom === depth) {
+        drawSideFace(
+          fb,
+          rects,
+          maze.walls,
+          cw,
+          cz,
+          right,
+          forward,
+          depth,
+          corridorEnd,
+          false,
+        )
       }
     }
 
