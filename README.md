@@ -1,4 +1,4 @@
-# X MAZE X — Labyrinth 1991 (Online)
+# X MAZE X — Labyrinth 1991
 
 A browser revival of a 3D labyrinth started in 1991 on a **Casio FX-7500G**
 graphic calculator. The original hand-written Casio BASIC program was 1091
@@ -8,8 +8,7 @@ wireframe corridors from the surviving notes.
 Everything is drawn on an emulated **96 × 64 monochrome LCD** at 30 fps, in the
 calculator's green-gray palette, with a subtle passive-LCD ghosting effect.
 
-This is the online version. The original Python/Pygame tribute lives in
-`../2026-10-16 Labyrinth Casio` and is left untouched.
+**Live demo:** <https://hipe-0.github.io/x-maze-x-labyrinth/>
 
 ![X MAZE X calculator UI](docs/screenshot-desktop.png)
 
@@ -17,8 +16,10 @@ This is the online version. The original Python/Pygame tribute lives in
 
 ## Play
 
+Requires **Node.js 20** or newer.
+
 ```bash
-npm install
+npm ci        # or: npm install
 npm run dev
 ```
 
@@ -75,11 +76,13 @@ Three.js mode can be added without changing the maze logic.
 
 ```bash
 npm run dev       # Vite dev server
-npm test          # 22 unit tests
+npm test          # 41 unit tests
 npm run lint      # oxlint
 npm run build     # production build in dist/
 npm run preview   # preview the production build
 ```
+
+See [PLAN.md](PLAN.md) for the improvement roadmap.
 
 ### VS Code
 
@@ -95,34 +98,31 @@ The task is defined in `.vscode/tasks.json`.
 
 ## Deploy to GitHub Pages
 
-The repository includes `.github/workflows/deploy.yml`.
+The repository includes `.github/workflows/deploy.yml`, which lints, tests,
+builds and deploys the site on every push to `main`.
 
-1. Create an empty **public** repository on GitHub, for example
-   `x-maze-x` (public is required for GitHub Pages on free accounts).
-2. Push this folder to it:
-   ```bash
-   git remote add origin https://github.com/<username>/x-maze-x.git
-   git push -u origin main
-   ```
-3. In the repository: **Settings → Pages → Build and deployment → Source**,
+1. In the repository: **Settings → Pages → Build and deployment → Source**,
    choose **GitHub Actions**.
-4. Every push to `main` builds, tests and deploys the site. The URL is
-   `https://<username>.github.io/x-maze-x/`.
+2. The site is published at
+   <https://hipe-0.github.io/x-maze-x-labyrinth/>.
 
 No repository-name configuration is needed: `vite.config.ts` uses
-`base: './'`.
+`base: './'`, so forks and renamed repositories work from any project path.
 
 ## The 1991 game
 
 The maze is 20 × 18 cells inside a two-cell border ring. You start in the west
 vestibule facing east and must reach the opening in the east border wall
-(`w = 22`) to win. The seed determines the maze. The design notes, the original
-code pages and the Python tribute are in the `2026-10-16 Labyrinth Casio`
-project.
+(`w = 22`) to win. The seed determines the maze. The original 1991 notes and
+code pages are not included in this repository.
 
 ## Credits
 
-- Original 1991 concept, code pages and notes: the companion
-  `2026-10-16 Labyrinth Casio` project.
-- Browser reconstruction: this project.
-- **Fan project. Not affiliated with Casio.**
+Designed and built by Hippolyte Mounier. The 1991 concept, the original Casio
+BASIC program and the surviving design notes are the author's own archive.
+
+**Fan project. Not affiliated with Casio.**
+
+## License
+
+Released under the [Apache License 2.0](LICENSE). © 2026 Hippolyte Mounier.
