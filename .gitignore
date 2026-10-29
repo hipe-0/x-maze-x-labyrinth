@@ -12,6 +12,18 @@ dist
 dist-ssr
 *.local
 
+# Environment
+.env
+.env.*
+!.env.example
+
+# Test and build caches
+coverage
+*.tsbuildinfo
+
+# Local reference material
+CASIO_FX7500G.jpg
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

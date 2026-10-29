@@ -2,7 +2,30 @@
   "name": "xmazex-online",
   "private": true,
   "version": "1.0.0",
+  "description": "X MAZE X — a browser revival of the 1991 Casio FX-7500G 3D labyrinth.",
+  "license": "Apache-2.0",
+  "author": "Hippolyte Mounier",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hipe-0/x-maze-x-labyrinth.git"
+  },
+  "homepage": "https://hipe-0.github.io/x-maze-x-labyrinth/",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "casio",
+    "casio-fx-7500g",
+    "labyrinth",
+    "maze",
+    "retro-gaming",
+    "react",
+    "typescript",
+    "vite",
+    "canvas",
+    "github-pages"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
