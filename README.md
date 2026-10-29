@@ -1,5 +1,7 @@
 # X MAZE X — Labyrinth 1991
 
+[![Deploy to GitHub Pages](https://github.com/hipe-0/x-maze-x-labyrinth/actions/workflows/deploy.yml/badge.svg)](https://github.com/hipe-0/x-maze-x-labyrinth/actions/workflows/deploy.yml)
+
 A browser revival of a 3D labyrinth started in 1991 on a **Casio FX-7500G**
 graphic calculator. The original hand-written Casio BASIC program was 1091
 steps long. Its 3D display code was lost; this version reconstructs the
