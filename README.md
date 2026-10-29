@@ -101,8 +101,10 @@ The task is defined in `.vscode/tasks.json`.
 The repository includes `.github/workflows/deploy.yml`, which lints, tests,
 builds and deploys the site on every push to `main`.
 
-1. In the repository: **Settings → Pages → Build and deployment → Source**,
-   choose **GitHub Actions**.
+1. The workflow enables GitHub Pages automatically on the first run. If the
+   deploy job still reports that Pages is not enabled, open
+   **Settings → Pages → Build and deployment → Source** and choose
+   **GitHub Actions**.
 2. The site is published at
    <https://hipe-0.github.io/x-maze-x-labyrinth/>.
 
